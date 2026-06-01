@@ -177,7 +177,7 @@ labels_dir = Path(DATASET_PATH) / "train" / "labels"
 images = list(images_dir.glob("*.jpg"))
 
 # Показываем первые 3 картинки
-plt.figure(figsize=(15, 10))
+plt.figure(figsize=(15, 6))
 
 for i in range(3):
     # Загружаем картинку
@@ -362,7 +362,7 @@ print("\n" + "=" * 50 +
       "\n6. ТЕПЛОВАЯ КАРТА (HEATMAP)\n"
       + "=" * 50)
 
-plt.figure(figsize=(8, 10))
+plt.figure(figsize=(8, 8))
 
 # Строим 2D гистограмму
 heatmap, xedges, yedges = np.histogram2d(

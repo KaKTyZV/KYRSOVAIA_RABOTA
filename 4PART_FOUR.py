@@ -19,7 +19,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # ============================================
 print("\n" + "=" * 50 + "\n1. ЗАГРУЗКА И ПЕРВИЧНОЕ ЗНАКОМСТВО\n" + "=" * 50)
 
-df = pd.read_csv("C:/Users/bobv6/Desktop/Kyrsovaia/4part_TEXT_data/bbc_data.csv")
+df = pd.read_csv("C:/Users/bobv6/Desktop/Kyrsovaia/4part_TEXT_data/train.csv")
 df.columns = ['text', 'label']
 
 print(f"\nЗагружено: {len(df)} текстов, {df['label'].nunique()} категорий "
@@ -31,7 +31,7 @@ for cat, count in cat_counts.items():
     print(f"  {cat}: {count} ({count/len(df)*100:.1f}%)")
 
 # ============================================
-# 2. ОЧИСТКА ТЕКСТА (ко всем текстам)
+# 2. ОЧИСТКА ТЕКСТА (ко всем текстам в train)
 # ============================================
 print("\n" + "=" * 50 + "\n2. ОЧИСТКА ТЕКСТА\n" + "=" * 50)
 
@@ -58,7 +58,7 @@ print(f"\nСимволов ДО очистки:    {total_chars_before:,} "
       f"\nСредняя длина ПОСЛЕ:    {df['clean_text'].str.len().mean():.0f}")
 
 # ============================================
-# 3. ЛЕММАТИЗАЦИЯ (ко всем текстам)
+# 3. ЛЕММАТИЗАЦИЯ (ко всем текстам в train)
 # ============================================
 print("\n" + "=" * 50 + "\n3. ЛЕММАТИЗАЦИЯ\n" + "=" * 50)
 
@@ -78,17 +78,15 @@ print(f"\nПример ДО лемматизации:"
 
 # Статистика лемматизации
 total_words_before = sum(len(word_tokenize(t)) for t in df['clean_text'])
-total_words_after = sum(len(word_tokenize(t)) for t in df['lemmas'])
 changed_words = 0
-for i in range(2225):
+for i in range(len(df)):
     orig = word_tokenize(df['clean_text'].iloc[i])
     lemm = word_tokenize(df['lemmas'].iloc[i])
     changed_words += sum(1 for a, b in zip(orig, lemm) if a != b)
 changed_percent = changed_words / total_words_before * 100
 
-print(f"Слов ДО лемматизации:      {total_words_before:,} "
-      f"\nСлов ПОСЛЕ лемматизации: {total_words_after:,} "
-      f"\nИзменили форму:          {changed_words:,} ({changed_percent:.1f}%)")
+print(f"\nВсего слов:      {total_words_before:,} "
+      f"\nИзменили форму:  {changed_words:,} ({changed_percent:.1f}%)")
 
 # ============================================
 # 4. ПОДСЧЁТ ЧАСТОТЫ СЛОВ (ко всем текстам)
@@ -128,7 +126,8 @@ plt.show()
 print("\n" + "=" * 50 + "\n5. ТОП-10 ПОСЛЕ УДАЛЕНИЯ СТОП-СЛОВ\n" + "=" * 50)
 
 # Дополнительные стоп-слова (то, что пропустил NLTK)
-extra_stops = [ 'wa', 'ha', 'u', 'mr', 'uk' ]
+extra_stops = [ 'wa', 'ha', 'u', 'mr', 'uk''wa', 'ha', 'u', 'mr', 'uk', 'also', 'would',
+                'could', 'said', 'told', 'say', 'one', 'two', 'get', 'like', 'make', 'even', 'back', 'well', 'time', 'year', 'new', 'last', 'first' ]
 stop_words = list(stopwords.words('english')) + extra_stops
 
 def remove_stopwords(text):
@@ -148,15 +147,38 @@ print(f"\nПример ДО удаления стоп-слов: \n{df['lemmas'].
       f"\nПример ПОСЛЕ удаления стоп-слов: \n{df['no_stopwords'].iloc[0][:200]}")
 
 # Статистика удаления стоп-слов
-words_before_stop = sum(len(t.split()) for t in df['lemmas'].head(500))
-words_after_stop = sum(len(t.split()) for t in df['no_stopwords'].head(500))
+words_before_stop = sum(len(t.split()) for t in df['lemmas'])
+words_after_stop = sum(len(t.split()) for t in df['no_stopwords'])
 removed_stop = words_before_stop - words_after_stop
 removed_stop_percent = removed_stop / words_before_stop * 100
 print(f"\nСлов ДО удаления:       {words_before_stop:,}"
       f"\nСлов ПОСЛЕ удаления:    {words_after_stop:,}"
       f"\nУдалено стоп-слов:      {removed_stop:,} ({removed_stop_percent:.1f}%)"
-      f"\nСреднее стоп-слов на текст ДО:    {words_before_stop // 500}"
-      f"\nСреднее стоп-слов на текст ПОСЛЕ: {words_after_stop // 500}")
+      f"\nСреднее слов на текст ДО:    {words_before_stop // len(df)}"
+      f"\nСреднее слов на текст ПОСЛЕ: {words_after_stop // len(df)}")
+
+# График(после удаления стоп-слов)
+all_words_clean = ' '.join(df['no_stopwords']).split()
+word_counts_clean = Counter(all_words_clean)
+top_words_clean = word_counts_clean.most_common(10)
+words1, counts1 = zip(*top_words_clean)
+
+plt.figure(figsize=(10, 5))
+plt.bar(words1, counts1, color='steelblue')
+plt.title('Топ-10 самых частых слов (BBC) после удаления стоп-слов')
+plt.xlabel('Слово')
+plt.ylabel('Частота')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# Облако слов
+wc = WordCloud(width=800, height=400, max_words=50, background_color='white').generate(' '.join(df['no_stopwords']))
+plt.figure(figsize=(10, 5))
+plt.imshow(wc, interpolation='bilinear')
+plt.axis('off')
+plt.title('Облако слов (BBC) после удаления стоп-слов')
+plt.show()
 
 # ============================================
 # 6. TF-IDF (ко всем текстам)
@@ -241,29 +263,29 @@ print(f"""
 
 2. Очистка текста:
    - Удалено символов: {removed_chars:,} ({removed_percent:.1f}%)
-   - Средняя длина: {total_chars_before/len(df):.0f} → {total_chars_after/len(df):.0f} символов
+   - Средняя длина: {total_chars_before/len(df):.0f} - {total_chars_after/len(df):.0f} символов
 
 3. Лемматизация:
-   - Обработаны все тексты
+   - Обработаны все тексты из train
    - Слов ДО: {total_words_before:,}
    - Изменили форму: {changed_words:,} ({changed_percent:.1f}%)
 
 4. Частотный анализ:
-   - Топ-слов до очистки: the, to, a, of, and (служебные части речи)
-   - После удаления стоп-слов: said, year, people, new, game
+   - Топ-слов до очистки: the, to, a, of, and
+   - После удаления стоп-слов: people, game, world, government
 
 5. Удаление стоп-слов:
    - Удалено: {removed_stop:,} слов ({removed_stop_percent:.1f}%)
-   - Среднее на текст: {words_before_stop//500} → {words_after_stop//500} слов
+   - Среднее на текст: {words_before_stop//len(df)} - {words_after_stop//len(df)} слов
 
 6. TF-IDF:
    - Размер словаря: {len(feature_names)} слов
-   - Топ-слова: said ({scores[top_indices[0]]:.0f}), year, game, film, people
+   - Топ-слова: game, film, people, government
    - Ненулевых значений в первом векторе: {tfidf_matrix[0].nnz}
 
 7. Информационный поиск:
-   - Запрос 'stock market economy' → business
-   - Запрос 'film music award' → entertainment
+   - Запрос 'stock market economy' - business
+   - Запрос 'film music award' - entertainment
    - Точность: высокая
 
 8. Пригодность: данные полностью пригодны для классификации новостей.
