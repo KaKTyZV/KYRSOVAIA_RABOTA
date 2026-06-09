@@ -10,7 +10,7 @@ import seaborn as sns
 import plotly.express as px
 
 # Загрузка датасета
-df = pd.read_csv(r'C:\Users\bobv6\Desktop\Kyrsovaia\1part_TABL_data\sleep_mobile_stress_dataset_15000.csv')
+df = pd.read_csv("SLEEP/sleep_mobile_stress_dataset_15000.csv")
 
 # ============================================
 # 1. Загрузка и первичное знакомство
@@ -422,7 +422,7 @@ print("="*50 +
 # Сохраняем оригинальные значения для сравнения
 df_original = df.copy()
 
-# Целевые признаки (не трогаем)
+# Целевые признаки
 target_cols = ['stress_level', 'sleep_quality_score', 'mental_fatigue_score']
 
 # Признаки для добавления шума (исключая целевые)
