@@ -3,6 +3,7 @@
 # ============================================
 print("\n" + "=" * 60 + "\nГЛАВА 3. АНАЛИЗ ДАННЫХ С ИЗОБРАЖЕНИЯМИ\n" + "=" * 60)
 
+import os
 import cv2
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -13,7 +14,8 @@ import numpy as np
 # ============================================
 print("\n" + "=" * 50 + "\n1. ЗАГРУЗКА И ПЕРВИЧНОЕ ЗНАКОМСТВО\n" + "=" * 50)
 
-DATASET_PATH = "C:/Users/bobv6/Desktop/Kyrsovaia/3part_TOMAT_data"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+DATASET_PATH = os.path.join(script_dir, "TOMAT")
 SPLIT = "train"
 
 COLORS = [
