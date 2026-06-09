@@ -19,7 +19,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # ============================================
 print("\n" + "=" * 50 + "\n1. ЗАГРУЗКА И ПЕРВИЧНОЕ ЗНАКОМСТВО\n" + "=" * 50)
 
-df = pd.read_csv("C:/Users/bobv6/Desktop/Kyrsovaia/4part_TEXT_data/train.csv")
+df = pd.read_csv("BBC/train.csv")
 df.columns = ['text', 'label']
 
 print(f"\nЗагружено: {len(df)} текстов, {df['label'].nunique()} категорий "
