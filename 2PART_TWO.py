@@ -3,6 +3,7 @@
 # ============================================
 print("\n" + "=" * 60 + "\nГЛАВА 2. АНАЛИЗ ДАННЫХ С ВРЕМЕННЫМИ РЯДАМИ\n" + "=" * 60)
 
+import os
 import pandas as pd
 import numpy as np
 import glob
@@ -14,7 +15,8 @@ import seaborn as sns
 # ============================================
 
 # Путь к папке с данными
-path = r"C:\Users\bobv6\Desktop\Kyrsovaia\2part_SKAB_data"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+path = os.path.join(script_dir, "SKAB")
 
 # Находим все CSV файлы
 all_files = glob.glob(f"{path}/**/*.csv", recursive=True)
@@ -498,7 +500,7 @@ print(f"""
 - Шум случаен, декомпозиция адекватна
 
 - Фильтрация данных не требуется
-""")
+""" + "\n" + "=" * 50 + "\nАНАЛИЗ ЗАВЕРШЁН\n" + "=" * 50)
 
 # ============================================
 #--------------------END----------------------
